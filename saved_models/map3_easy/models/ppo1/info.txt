@@ -1,0 +1,201 @@
+The model has been trained with 1000 epochs on map3_easy.txt
+
+The environment configurations are
+
+import numpy as np
+import os
+
+
+environment_config = dict(
+
+
+    #Observation space for gym sapientino.
+    obs = dict(
+                gymtpl0 = dict(type = 'float',shape= (7,),min_value = -np.inf,max_value = np.inf),
+                gymtpl1 = dict(type ='int',shape=(1,))
+                ),
+
+    #Number of colors we consider in gym sapientino.
+    num_colors = 3,
+
+    #Take the id of the sink state of the automaton
+    sink_id = 2,
+
+    #Additional params for gym sapientino.
+    params = dict(
+        reward_per_step=-1.0,
+        reward_outside_grid=0.0,
+        reward_duplicate_beep=0.0,
+        acceleration=0.4,
+        angular_acceleration=25.0,
+        max_velocity=0.6,
+        min_velocity=0.4,
+        max_angular_vel=40,
+        initial_position=[3, 3],
+        tg_reward=1000.0,
+    ),
+
+    #Specify the color sequence, the goal.
+    goal = ['blue','red','green'],
+
+
+)
+
+
+
+
+
+
+The agent configurations are:
+
+
+
+import numpy as np
+from tensorforce.agents import Agent
+
+
+
+
+def build_agent(agent, batch_size,environment,num_states_automaton,
+                      hidden_layer_size,automaton_state_encoding_size,
+                      memory= 'minimum',
+                     update_frequency = 20,multi_step = 10,exploration = 0.0, learning_rate = 0.001, non_markovian = True):
+
+
+    """
+    Desc: simple function that creates the agent parameters dictionary and manages
+    the code to define relevant hyperparameters. It defines also the structure
+    of the policy (and the baseline) networks.
+
+    Args:
+        agent:
+        memory:
+        batch_size:
+        environment:
+        num_states_automaton:
+        hidden_layer_size:
+        non_markovian:
+
+    Returns:
+
+    """
+
+
+
+    AUTOMATON_STATE_ENCODING_SIZE = automaton_state_encoding_size
+
+    if non_markovian:
+        agent = Agent.create(
+
+            #Dictionary containing the agent configuration parameters
+            agent = agent,
+            memory = memory,
+            batch_size = batch_size,
+            environment = environment,
+            update_frequency = update_frequency,
+            multi_step = multi_step,
+            states = dict(
+                gymtpl0 = dict(type = 'float',shape= (7,),min_value = -np.inf,max_value = np.inf),
+                gymtpl1 = dict(type ='float',shape=(AUTOMATON_STATE_ENCODING_SIZE,),min_value = 0.0, max_value = 1.0)
+            ),
+
+            #The actor network which computes the policy.
+
+            network=dict(type = 'custom',
+                         layers= [
+                             dict(type = 'retrieve',tensors= ['gymtpl0']),
+                             dict(type = 'linear_normalization'),
+                             dict(type='dense', bias = True,activation = 'tanh',size=AUTOMATON_STATE_ENCODING_SIZE),
+                             dict(type= 'register',tensor = 'gymtpl0-dense1'),
+
+                             #Perform the product between the one hot encoding of the automaton and the output of the dense layer.
+                             dict(type = 'retrieve',tensors=['gymtpl0-dense1','gymtpl1'], aggregation = 'product'),
+                             dict(type='dense', bias = True,activation = 'tanh',size=AUTOMATON_STATE_ENCODING_SIZE),
+                             dict(type= 'register',tensor = 'gymtpl0-dense2'),
+                             dict(type = 'retrieve',tensors=['gymtpl0-dense2','gymtpl1'], aggregation = 'product'),
+                             dict(type='register',tensor = 'gymtpl0-embeddings'),
+
+                         ],
+
+                         ),
+
+            #learning_rate = dict(type = 'linear', initial_value = 0.001, unit = 'episodes',
+            #                     num_steps = 500, final_value =0.0008),
+            learning_rate = learning_rate,
+            exploration = exploration,
+
+            saver=dict(directory='model'),
+            summarizer=dict(directory='summaries',summaries=['reward','graph']),
+
+        )
+
+    else:
+        agent = Agent.create(
+
+        #Dictionary containing the agent configuration parameters
+        agent = agent,
+        memory = memory,
+        batch_size = batch_size,
+        environment= environment,
+        states = dict(
+                    gymtpl0 = dict(type = 'float',shape= (7,),min_value = -np.inf,max_value = np.inf),
+                    gymtpl1 = dict(type ='int',shape=(1,))
+                    ),
+
+                             #The actor network which computes the policy.
+
+                             network=dict(type = 'custom',
+                                          layers= [
+                                              dict(type = 'retrieve',tensors= ['gymtpl0']),
+                                              dict(type = 'linear_normalization'),
+                                              dict(type='dense', bias = True,activation = 'tanh',size=hidden_layer_size),
+
+                                              #Perform the product between the one hot encoding of the automaton and the output of the dense layer.
+                                              dict(type='dense', bias = True,activation = 'tanh',size=hidden_layer_size),
+                                              dict(type='register',tensor = 'gymtpl0-embeddings'),
+
+                                              ],
+
+                            ),
+
+                            #learning_rate = dict(type = 'linear', initial_value = 0.001, unit = 'episodes',
+                            #                     num_steps = 500, final_value =0.0008),
+                            learning_rate = learning_rate,
+                            exploration = exploration,
+
+
+                            saver=dict(directory='model'),
+                            summarizer=dict(directory='summaries',summaries=['reward','graph']),
+
+
+
+
+    )
+
+    return agent
+
+
+
+
+
+
+ NUM_STATES_AUTOMATON = 5
+
+    HIDDEN_STATE_SIZE = 128
+
+    AUTOMATON_STATE_ENCODING_SIZE = HIDDEN_STATE_SIZE*NUM_STATES_AUTOMATON
+
+    agent = build_agent(agent = 'ppo', batch_size = 64,
+                        environment = environment,
+                        num_states_automaton =NUM_STATES_AUTOMATON,
+                        automaton_state_encoding_size=AUTOMATON_STATE_ENCODING_SIZE,
+
+                        hidden_layer_size=HIDDEN_STATE_SIZE,
+
+
+                        exploration = 0.0,
+                        )
+
+
+The summaries are attached inside the same folder.
+
