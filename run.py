@@ -16,6 +16,9 @@ from gym_sapientino_case.env import SapientinoCase
 import argparse
 from utils.one_hot import *
 
+import argparse
+
+
 SINK_ID = 2
 
 
@@ -57,6 +60,26 @@ if __name__ == '__main__':
         logdir =log_dir
 
     )
+
+    #Handle command line arguments
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--num_colors', type = int, default = 1, help="Number of distinct colors in the map.")
+    parser.add_argument('--max_timesteps', type = int, default = 300, help= "Maximum number of timesteps each episode.")
+    parser.add_argument('--episodes', type = int, default = 1000, help = "Number of training episodes.")
+
+
+    args = parser.parse_args()
+
+
+
+    #Load the correct agent according to the colors.
+    num_colors = args.num_colors
+
+
+    MAX_EPISODE_TIMESTEPS = args.max_timesteps
+
+
 
     #Set this value here to the maximum timestep value.
     MAX_EPISODE_TIMESTEPS = 350
