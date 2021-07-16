@@ -1,6 +1,7 @@
 
 
 # Reasoning Agent project:
+# Reasoning Agent project:
 ## Non markovian policy networks for LTLf/LDLf goals
 
 This folder contains a working implementation of a non markovian policy network for an agent that solves a non markovian task. The project is based on **[tensorforce 0.6.4](https://github.com/tensorforce/tensorforce)** and **[openAI gym](https://github.com/openai/gym)** .
@@ -10,7 +11,27 @@ We use also a custom gym environment to run experiments with non markovian rewar
 The task consists in visiting a sequence of colored tiles in a given order in a two dimensional map. 
 The color sequence is the temporal goal that the agent should reach.
 
-## Install the project
+
+![](report/images/map3_easy.png)
+
+
+## Agent description
+The non markovian implementation is based on thee joint effort of multiple separate experts, each one trained to reach a different color of the goal sequence.
+
+![](report/images/baseline_implementation_schema.png)
+
+
+ The expert training performed using  [proximal policy optimization](https://arxiv.org/abs/1707.06347) algorithm with default clipping value and no entropy regularization.
+
+
+
+![](report/images/network_implementation.png)
+
+
+ The proposed  implementation is based uses a single policy network divided amongst the experts so that each portion of the network is assigned to a different expert.
+This approach guarantees **convergence** on a variety of maps with different **colored tile positioning** and **goal formulation**, showing robustness to goal and task parameters variations.
+
+## Install the required packages
 Open your terminal and type
 
 `	git clone https://github.com/francycar/RA_project` 
@@ -71,8 +92,7 @@ Refer to the **[tensorforce 0.6.4](https://github.com/tensorforce/tensorforce)**
 As we already mentioned, we released two pretrained agents for the two and three colors respecively as a showcase. You can run these agents in evaluation typing:
 
 
-`	python run.py --num_colors <number of colors. Can be in {2,3} `
+`	python run.py --num_colors <number of colors. Can be in {2,3}> `
 
 Using the same syntax described for the training process you specify *max_timestep* and *episodes* parameters for the evaluation.
-
 

@@ -64,7 +64,7 @@ if __name__ == '__main__':
 
     )
 
-
+    """
     #Handle command line arguments
     parser = argparse.ArgumentParser()
 
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_colors', type = int, default = 1, help="Number of distinct colors in the map.")
     parser.add_argument('--learning_rate', type = float, default = 0.001, help="Learning rate for the optimization algorithm")
     parser.add_argument('--exploration', type = float, default = 0.0, help = "Exploration for the epsilon greedy algorithm.")
-    parser.add_argument('--entropy_bonus', type = float, default = 0.0, help ="Entropy bonus for the 'extended' loss of PPO. It discourages the policy distribution from being “too certain” (default: no entropy regularization" )
+    parser.add_argument('--entropy_bonus', type = float, default = 0.0, help ="Entropy bonus for the 'extended' loss of PPO. It discourages the policy distribution from being “too certain” (default: no entropy regularization." )
     parser.add_argument('--hidden_size', type = int, default = 128, help="Number of neurons of the hidden layers of the network.")
     parser.add_argument('--max_timesteps', type = int, default = 300, help= "Maximum number of timesteps each episode.")
     parser.add_argument('--episodes', type = int, default = 1000, help = "Number of training episodes.")
@@ -109,6 +109,7 @@ if __name__ == '__main__':
     #There are both the initial and the sink additional states.
     NUM_STATE_AUTOMATON = num_colors+2
 
+    """
 
 
 
@@ -140,8 +141,8 @@ if __name__ == '__main__':
                         hidden_layer_size=HIDDEN_STATE_SIZE,
 
                         exploration =0.0,
-                        update_frequency =60
-
+                        update_frequency =20,
+                        entropy_regularization=0.2
 
 
                         )
