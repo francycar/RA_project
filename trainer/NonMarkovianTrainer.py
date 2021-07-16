@@ -102,8 +102,7 @@ class NonMarkovianTrainer(object):
 
                     if automaton_state == self.sink_id:
                         reward = -500.0
-                        ep_reward += reward
-                        cum_reward += reward
+
                         terminal = True
 
 
