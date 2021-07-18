@@ -124,4 +124,4 @@ You can specify additional training *hyperparameters* to the command line
 - --*learning_rate*: learning rate for the optimization algorithm
 
 For a finer agent customization, you can directly modify the agent construction inside *agent_config.py* 
-Refer to the **[tensorforce 0.6.4](https://github.com/tensorforce/tensorforce)** documentation for tensorforce agent construction syntax.
+Refer to the **[Tensorforce 0.6.4 documentation](https://tensorforce.readthedocs.io/en/latest/index.html)**  for Tensorforce agent construction syntax.
