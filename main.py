@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
 
 
-    map_file = os.path.join('.', 'maps/map4_easy.txt')
+    map_file = os.path.join('.', 'maps/map2_easy.txt')
 
     #Log directory for the automaton states.
     log_dir = os.path.join('.','log_dir')
@@ -44,7 +44,7 @@ if __name__ == '__main__':
     #Istantiate the gym sapientino environment.
     environment = SapientinoCase(
 
-        colors = ['blue','red','yellow','green'],
+        colors = ['blue','green'],
 
         params = dict(
             reward_per_step=-1.0,
@@ -55,7 +55,7 @@ if __name__ == '__main__':
             max_velocity=0.6,
             min_velocity=0.4,
             max_angular_vel=40,
-            initial_position=[3, 3],
+            initial_position=[4, 2],
             tg_reward=1000.0,
         ),
 
@@ -108,6 +108,7 @@ if __name__ == '__main__':
 
     #There are both the initial and the sink additional states.
     NUM_STATE_AUTOMATON = num_colors+2
+    
 
     """
 
@@ -117,22 +118,22 @@ if __name__ == '__main__':
 
 
     #Set this value here to the maximum timestep value.
-    MAX_EPISODE_TIMESTEPS = 400
+    MAX_EPISODE_TIMESTEPS = 300
 
     #Choose whether or not to visualize the environment
-    VISUALIZE = False
+    VISUALIZE = True
 
     # Limit the length of the episode of gym sapientino.
     environment = TimeLimit(environment, MAX_EPISODE_TIMESTEPS)
     environment = Environment.create(environment =environment,max_episode_timesteps=MAX_EPISODE_TIMESTEPS,visualize =VISUALIZE)
 
-    NUM_STATES_AUTOMATON = 6
+    NUM_STATES_AUTOMATON = 4
 
-    HIDDEN_STATE_SIZE = 256
+    HIDDEN_STATE_SIZE = 64
 
     AUTOMATON_STATE_ENCODING_SIZE = HIDDEN_STATE_SIZE*NUM_STATES_AUTOMATON
 
-    agent = build_agent(agent = 'ppo', batch_size = 128,
+    agent = build_agent(agent = 'ppo', batch_size = 64,
 
                         environment = environment,
                         num_states_automaton =NUM_STATES_AUTOMATON,
@@ -141,8 +142,8 @@ if __name__ == '__main__':
                         hidden_layer_size=HIDDEN_STATE_SIZE,
 
                         exploration =0.0,
-                        update_frequency =20,
-                        entropy_regularization=0.2
+
+                        entropy_regularization=0.0
 
 
                         )
@@ -154,7 +155,7 @@ if __name__ == '__main__':
 
 
 
-    EPISODES = 2000
+    EPISODES = 1000
 
     #Train the agent
 

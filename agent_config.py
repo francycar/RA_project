@@ -9,7 +9,7 @@ def build_agent(agent, batch_size,environment,num_states_automaton,
                       hidden_layer_size,automaton_state_encoding_size,
                       memory= 'minimum',
                      update_frequency = 20,multi_step = 10,exploration = 0.0, learning_rate = 0.001,
-                non_markovian = True, entropy_regularization = 0.0):
+                non_markovian = True, entropy_regularization = 0.0, saver = None):
 
 
     """
@@ -18,22 +18,36 @@ def build_agent(agent, batch_size,environment,num_states_automaton,
     of the policy (and the baseline) networks.
 
     Args:
-        agent:
-        memory:
-        batch_size:
-        environment:
-        num_states_automaton:
-        hidden_layer_size:
-        non_markovian:
-
+        agent: (string) the name of the deep reinforcement learning algorithm used to train the agent.
+        memory: (int) the size of the agent memory.
+        batch_size: (int) the size of experience batch collected by the agent.
+        environment: (tensorforce.environments.Environment) istance of the tensorforce environment in which the is trained.
+        num_states_automaton: (int) number of states of the goal state DFA.
+        automaton_state_encoding_size: (int) size of the binary encoding of the automaton state. See the report in report/pdf in section "Non markovian agent" for further details.
+        hidden_layer_size: (int) number of neurons of the policy network hidden layer (default implementation features two hidden layers with an equal number of neurons).
+        non_markovian: (bool) boolean flag specifying whether or not to istantiate an agent with a non markovian policy network. In the project the markovian agent is used essentially as a baseline for comparisons.
+        update_frequency: (int) frequency of updates (default 20).
+        multi_step: (int) number of optimization steps, update_frequency * multi_step should be at least 1 if relative subsampling_fraction (default: 10).
+        exploration: (float) exploration, defined as the probability for uniformly random output in case of bool and int actions, and the standard deviation of Gaussian noise added to every output in case of float actions, specified globally or per action-type or -name (default: no exploration).
+        learning_rate: (float) optimizer learning rate (default: 0.001)
+        entropy_regularization: (float) entropy regularization loss weight, to discourage the policy distribution from being “too certain” (default: no entropy regularization).
+        saver: (dict)
     Returns:
 
     """
 
 
+    #Istantiate a default saver if not passed as argument.
+    if not saver:
+        saver=dict(directory='model')
+
 
     AUTOMATON_STATE_ENCODING_SIZE = automaton_state_encoding_size
 
+
+    """
+        Istantiate a policy network for a non markovian agent.
+    """
     if non_markovian:
         agent = Agent.create(
 
@@ -69,18 +83,23 @@ def build_agent(agent, batch_size,environment,num_states_automaton,
 
                          ),
 
-            #learning_rate = dict(type = 'linear', initial_value = 0.001, unit = 'episodes',
-            #                     num_steps = 500, final_value =0.0008),
+
             learning_rate = learning_rate,
             exploration = exploration,
 
-            saver=dict(directory='model'),
+            saver=saver,
             summarizer=dict(directory='summaries',summaries=['reward','graph']),
             entropy_regularization = entropy_regularization
 
         )
 
+
+
     else:
+        """
+            Istantiate a policy network for a markovian agent.
+        """
+
         agent = Agent.create(
 
         #Dictionary containing the agent configuration parameters

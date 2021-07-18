@@ -13,7 +13,7 @@ DEBUG = True
 
 class NonMarkovianTrainer(object):
     def __init__(self,agent,environment,num_state_automaton,
-                 automaton_encoding_size,sink_id, automaton_states_params = None
+                 automaton_encoding_size,sink_id
                  ):
 
         """
@@ -22,10 +22,12 @@ class NonMarkovianTrainer(object):
         "agent_params" variable. The agent, and in particular the neural network, should be already non markovian.
 
         Args:
-            agent_params:
-            environment_params:
-            num_state_automaton:
-            automaton_encoding_size:
+            @param agent: (tensorforce.agents.Agent) tensorforce agent (algrithm) that will be used to train the policy network (example: ppo, ddqn,dqn).
+            @param environment: (tensorforce.environments.Environment) istance of the tensorforce/openAI gym environment used for training.
+            @param num_state_automaton: (int) number of states of the goal state DFA.
+            @automaton_state_encoding_size: (int) size of the binary encoding of the automaton state. See the report in report/pdf in section "Non markovian agent" for further details.
+            @sink_id: (int) the integer representing the failure state of the goal DFA.
+
         """
 
 
@@ -41,8 +43,6 @@ class NonMarkovianTrainer(object):
         self.environment = environment
 
 
-        #Store the automaton states params if needed.
-        self.automaton_states_params = automaton_states_params
 
         if DEBUG:
             architecture = self.agent.get_architecture()
@@ -52,9 +52,14 @@ class NonMarkovianTrainer(object):
 
 
 
-    def train(self,episodes = 1000, evaluate = True):
+    def train(self,episodes = 1000):
 
-        evaluation_rewards = list()
+        """
+            @param episodes: (int) number of training episodes.
+        """
+
+
+
 
 
         cum_reward = 0.0
@@ -62,10 +67,29 @@ class NonMarkovianTrainer(object):
 
 
         def pack_states(states):
+            """
+                Desc: utility function that packs the state dictionary so that it can be passed as input to the
+                    non markovian agent.
+
+                Args:
+                    states: (dict) a python dictionary with two keys:
+                        'gymtpl0': (np.ndarray) contains the 7 element floating point vector representing the gym sapientino state vector.
+                        'gymtpl1': (int) represents the automaton state.
+
+                Returns:
+                        python dictionary with two keys:
+                            'gymtpl0': (np.ndarray) contains the 7 element floating point vector representing the gym sapientino state vector.
+                            'gymtpl1': (np.ndarray) the binary encoded representation for the automaton state (see the pdf report in ./report section "Non markovian agent" for additional details.
+            """
+
 
             obs = states['gymtpl0']
             automaton_state = states['gymtpl1'][0]
 
+
+            """
+                Prepare the encoded automaton state.
+            """
             one_hot_encoding = one_hot_encode(automaton_state,
                                               self.automaton_encoding_size,self.num_state_automaton)
 
@@ -74,6 +98,15 @@ class NonMarkovianTrainer(object):
 
         agent = self.agent
         environment = self.environment
+
+
+
+        """
+            The training loop is inspired by the Tensorforce agent "act observe" paradigm 
+            https://tensorforce.readthedocs.io/en/latest/basics/getting-started.html
+        """
+
+
 
         try:
             for episode in tqdm(range(episodes),desc='training',leave = True):
@@ -100,6 +133,14 @@ class NonMarkovianTrainer(object):
                     automaton_state = states['gymtpl1'][0]
                     states = pack_states(states)
 
+
+                    """
+                        Reward shaping.
+                    """
+
+
+
+                    #Terminate the episode with a negative reward if the goal DFA reaches SINK state (failure).
                     if automaton_state == self.sink_id:
                         reward = -500.0
 
@@ -111,21 +152,21 @@ class NonMarkovianTrainer(object):
 
                     elif automaton_state == 3 and prevAutState==1:
                         reward = 500.0
-
+                        print("Visited goal on episode: ", episode)
+                    """
                     elif automaton_state ==4 and prevAutState == 3:
                         reward = 500.0
-
+                        print("Visited goal on episode: ", episode)
+                    """
+                    """
                     elif automaton_state == 5:
                         reward = 500.0
                         print("Visited goal on episode: ", episode)
+                    """
+
+
 
                     prevAutState = automaton_state
-
-
-                    """
-                    Check if the automaton state is sink. In this case, stop the episode.            
-                    """
-
 
 
 
@@ -141,57 +182,6 @@ class NonMarkovianTrainer(object):
                     if terminal == True:
                         states = environment.reset()
 
-                EVALUATION_EPISODES = 100
-
-                if evaluate == True:
-
-                    if (episode+1) %100 == 0:
-                        # Evaluate for 100 episodes
-                        sum_rewards = 0.0
-
-                        prevAutState = 0
-                        for _ in range(EVALUATION_EPISODES):
-                            states = environment.reset()
-
-
-                            internals = agent.initial_internals()
-                            terminal = False
-                            while not terminal:
-                                states = pack_states(states)
-
-
-
-                                actions, internals = agent.act(
-                                    states=states, internals=internals,
-                                    independent=True, deterministic=True
-                                )
-                                states, terminal, reward = environment.execute(actions=actions)
-                                automaton_state = states['gymtpl1'][0]
-
-
-                                if automaton_state == self.sink_id:
-                                    reward = -500.0
-                                    ep_reward += reward
-                                    cum_reward += reward
-                                    terminal = True
-
-
-                                elif automaton_state == 1 and prevAutState!=1:
-                                    reward = 500.0
-
-                                elif automaton_state == 3:
-                                    reward = 500.0
-                                    print("Visited the goal in episode: ", episode)
-
-                                prevAutState = automaton_state
-
-
-
-
-                                sum_rewards += reward
-
-                        print('Evaluation on episode:',episode,' total reward on', EVALUATION_EPISODES, " episodes: ", sum_rewards)
-                        evaluation_rewards.append(sum_rewards)
 
 
             #Close both the agent and the environment.
@@ -200,8 +190,7 @@ class NonMarkovianTrainer(object):
 
 
             return dict(cumulative_reward_nodiscount = cum_reward,
-                        average_reward_nodiscount = cum_reward/episodes,
-                        evaluation_rewards = evaluation_rewards)
+                        average_reward_nodiscount = cum_reward/episodes)
         finally:
 
            #Let the user interrupt

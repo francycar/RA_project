@@ -1,0 +1,2 @@
+This training has been performed with the same parameters of map_3colors_map3easy_convergence to make the video.
+

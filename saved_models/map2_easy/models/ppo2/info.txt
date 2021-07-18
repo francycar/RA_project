@@ -1,0 +1,2 @@
+This experiment is run with the same parameter configuration of ppo1 BUT
+with entropy_regularization = 0.2

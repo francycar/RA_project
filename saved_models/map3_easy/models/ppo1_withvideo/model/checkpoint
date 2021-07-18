@@ -1,0 +1,14 @@
+model_checkpoint_path: "agent-50"
+all_model_checkpoint_paths: "agent-0"
+all_model_checkpoint_paths: "agent-10"
+all_model_checkpoint_paths: "agent-20"
+all_model_checkpoint_paths: "agent-30"
+all_model_checkpoint_paths: "agent-40"
+all_model_checkpoint_paths: "agent-50"
+all_model_checkpoint_timestamps: 1626478870.501157
+all_model_checkpoint_timestamps: 1626479396.80915
+all_model_checkpoint_timestamps: 1626480123.4981863
+all_model_checkpoint_timestamps: 1626480681.756924
+all_model_checkpoint_timestamps: 1626481203.90754
+all_model_checkpoint_timestamps: 1626481743.206672
+last_preserved_timestamp: 1626475111.3641846
