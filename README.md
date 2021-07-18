@@ -3,34 +3,37 @@
 # Reasoning Agent project:
 ## Non markovian policy networks for LTLf/LDLf goals
 
-This folder contains an implementation of a **non markovian policy network**  for a project whose goal is to develop a reinforcement learning agent for solving a non markovian reward decision process. The project is focused on temporal goal formulation and on showing how deep RL SOA approaches can be easily adapted to work outside a standard reinforcement learning scenario. 
-We deploy the agent neural network  on **[Tensorforce 0.6.4](https://github.com/tensorforce/tensorforce)**, an open source deep reinforcement learning library based on the popular deep learning libaries *Tensorflow*  and *Keras*.  
+This folder contains an implementation of a **non markovian policy network**  for a project whose goal is to develop a reinforcement learning agent for solving a **non markovian reward decision process**. The project is focused on temporal goal formulation and on showing how deep RL SOA approaches can be easily adapted to work outside a standard reinforcement learning scenario. 
+We deploy the agent neural network  on **[Tensorforce 0.6.4](https://github.com/tensorforce/tensorforce)**, an open source deep reinforcement learning library based on the popular deep learning libaries: *Tensorflow*  and *Keras*.  
 
 <br/>
 
 The project experiments are run on  **[Gym Sapientino](https://github.com/cipollone/gym-sapientino-case)** :  a  custom **[openAI-gym](https://github.com/openai/gym)** environment which supports non markovian rewards . 
-For a deeper insight of non markovian  reward description, refer to the paper
+For a deeper insight of non markovian  reward, please refer to the paper
 [ LTLf/LDLf Non-Markovian Rewards](https://ojs.aaai.org/index.php/AAAI/article/view/11572) which you can find also attached inside the *paper/* directory in the folder.
-The agent can move in the environment which is essentially a two dimensional rectangular map in which some colored tiles represents *position of interest* the agent should visiting during the exploration of the environment.
+
+<br/>
+
+ **[Gym Sapientino](https://github.com/cipollone/gym-sapientino-case)** has  a continuous state space and a discrete action space. 
+The agent can move in the environment which is essentially a two dimensional rectangular map in which some colored tiles represent *position of interest* the agent should visiting during the exploration of the environment.
 
 
 ![](report/images/map3_easy.png)
 
 
- **[Gym Sapientino](https://github.com/cipollone/gym-sapientino-case)** has  a continuous state space and a discrete action space.
 
 <br/>
 
-We present also a [pdf report](https://github.com/francycar/RA_project/blob/main/report/Reasoning_Agent.pdf) containing a small compilative survey on the main adopted technologies, as well as a comparative analysis on the experimental results obtained with different environment and agent configurations.
+We present also a [pdf report](https://github.com/francycar/RA_project/blob/main/report/Reasoning_Agent.pdf) containing a small compilative survey on the employed technologies, as well as a comparative analysis on the experimental results obtained with different environment and agent configurations.
 
 <br/>
 
-We attach also a video folder containing a series of videos showing the non markovian agent behaviour on a series of map with different goal  formulations and environment settings.
+We attach also a video folder containing two videos showing the non markovian agent behaviour in two distinct maps with different goal  formulations and environment settings.
 
 # Task description
 The task consists in visiting a sequence of colored tiles in a given order in a two dimensional map. 
-The color sequence is the temporal goal associated to the task.  
-Below we show an example of execution in which the  goal sequence is  
+**The color sequence is the temporal goal associated to the task**.  
+Below we show an example  in which the  goal sequence is  
 G={blue,green}  
 
 ![](report/images/map2_easy.png)
@@ -53,19 +56,19 @@ G={blue,green}
 
 
 #  Agent description
-The non markovian implementation is based on thee joint effort of multiple separate experts, each one trained to reach a different color of the goal sequence. The expert selection is determined by the color which should be visited *"next"* in the goal sequence which is an information which can be inferred by inspecting the goal DFA.
+The non markovian implementation is based on the joint effort of multiple separate experts, each one trained to reach a different color of the goal sequence. The expert selection is determined by the color which should be visited *"next"* in the goal sequence which is an information inferred by direct inspection of the state of the goal DFA (see the [report](https://github.com/francycar/RA_project/blob/main/report/Reasoning_Agent.pdf) for a more detailed discussion on the expert selection).
 
 ![](report/images/baseline_implementation_schema.png)
 
 
- The expert training performed using  [proximal policy optimization](https://arxiv.org/abs/1707.06347) algorithm with default parameters.
+ The expert training is performed using  [proximal policy optimization](https://arxiv.org/abs/1707.06347) algorithm with default parameters.
 
 
 
 ![](report/images/network_implementation.png)
 
 
- The proposed  implementation employs a single policy network divided amongst the experts so that each portion of the network is assigned to a different expert.
+ The proposed  implementation features a single policy network divided amongst the experts, so that each *portion* (chunk) of the network is assigned to a different expert.
 This approach guarantees **convergence** on a variety of maps with different **colored tile positioning** and **goal formulation**, showing robustness to goal and task parameters variations.
 
 #  Run the project
@@ -124,4 +127,4 @@ You can specify additional training *hyperparameters* to the command line
 - --*learning_rate*: learning rate for the optimization algorithm
 
 For a finer agent customization, you can directly modify the agent construction inside *agent_config.py* 
-Refer to the **[Tensorforce 0.6.4 documentation](https://tensorforce.readthedocs.io/en/latest/index.html)**  for Tensorforce agent construction syntax.
+Refer to the **[tensorforce 0.6.4](https://github.com/tensorforce/tensorforce)** documentation for tensorforce agent construction syntax.
