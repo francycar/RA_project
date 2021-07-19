@@ -23,7 +23,7 @@ from argparse import ArgumentParser
 
 SINK_ID = 2
 
-DEBUG = True
+DEBUG = False
 
 
 
@@ -35,8 +35,69 @@ DEBUG = True
 if __name__ == '__main__':
 
 
+    #Handle command line arguments
+    parser = argparse.ArgumentParser()
 
-    map_file = os.path.join('.', 'maps/map2_easy.txt')
+    parser.add_argument('--batch_size', type = int, default = 64,help= 'Experience batch size.')
+    parser.add_argument('--memory', type = int, default = None,help= 'Memory buffer size. Used by agents that train with replay buffer.')
+    parser.add_argument('--multi_step',type = int, default = 10, help="Agent update optimization steps.")
+    parser.add_argument('--update_frequency', type = int, default = None, help="Frequency of the policy updates. Default equals to batch_size.")
+    parser.add_argument('--num_colors', type = int, default = 2, help="Number of distinct colors in the map.")
+    parser.add_argument('--learning_rate', type = float, default = 0.001, help="Learning rate for the optimization algorithm")
+    parser.add_argument('--exploration', type = float, default = 0.0, help = "Exploration for the epsilon greedy algorithm.")
+    parser.add_argument('--entropy_bonus', type = float, default = 0.0, help ="Entropy bonus for the 'extended' loss of PPO. It discourages the policy distribution from being “too certain” (default: no entropy regularization." )
+    parser.add_argument('--hidden_size', type = int, default = 64, help="Number of neurons of the hidden layers of the network.")
+    parser.add_argument('--max_timesteps', type = int, default = 300, help= "Maximum number of timesteps each episode.")
+    parser.add_argument('--episodes', type = int, default = 1000, help = "Number of training episodes.")
+    parser.add_argument('--path', type = str, default = None, help = "Path to the map file inside the file system.")
+    parser.add_argument("--sequence", nargs="+", default=None)
+
+
+
+
+
+    args = parser.parse_args()
+
+    #Collect some information from the argument parser.
+    batch_size = args.batch_size
+    memory = args.memory
+    update_frequency = args.update_frequency
+    multi_step = args.multi_step
+    num_colors = args.num_colors
+    learning_rate = args.learning_rate
+    entropy_bonus = args.entropy_bonus
+    exploration = args.exploration
+
+
+
+
+    #Extract the map from the command line arguments
+    if not args.path:
+        if num_colors == 2:
+            map_file = os.path.join('.','maps/map2_easy.txt')
+        elif num_colors == 3:
+            map_file = os.path.join('.', 'maps/map3_easy.txt')
+        elif num_colors == 4:
+            map_file = os.path.join('.','maps/map4_easy.txt')
+        else:
+            raise AttributeError('Map with ', num_colors,' colors not supported by default. Specify a path for a map file.')
+    else:
+        map_file = args.path
+
+
+    #Extract the goal sequence form the command line arguments
+    if not args.sequence:
+        if num_colors == 2:
+            colors = ['blue','green']
+        elif num_colors == 3:
+            colors = ['blue','red','green']
+        elif num_colors == 4:
+            colors = ['blue','red','yellow','green']
+        else:
+            raise AttributeError('Map with ', num_colors,' colors not supported by default. Specify a path for a map file.')
+    else:
+        colors = args.sequence
+
 
     #Log directory for the automaton states.
     log_dir = os.path.join('.','log_dir')
@@ -44,7 +105,7 @@ if __name__ == '__main__':
     #Istantiate the gym sapientino environment.
     environment = SapientinoCase(
 
-        colors = ['blue','green'],
+        colors = colors,
 
         params = dict(
             reward_per_step=-1.0,
@@ -64,33 +125,13 @@ if __name__ == '__main__':
 
     )
 
-    """
-    #Handle command line arguments
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('--batch_size', type = int, default = 64,help= 'Experience batch size.')
-    parser.add_argument('--memory', type = int, default = None,help= 'Memory buffer size. Used by agents that train with replay buffer.')
-    parser.add_argument('--multi_step',type = int, default = 10, help="Agent update optimization steps.")
-    parser.add_argument('--update_frequency', type = int, default = None, help="Frequency of the policy updates. Default equals to batch_size.")
-    parser.add_argument('--num_colors', type = int, default = 1, help="Number of distinct colors in the map.")
-    parser.add_argument('--learning_rate', type = float, default = 0.001, help="Learning rate for the optimization algorithm")
-    parser.add_argument('--exploration', type = float, default = 0.0, help = "Exploration for the epsilon greedy algorithm.")
-    parser.add_argument('--entropy_bonus', type = float, default = 0.0, help ="Entropy bonus for the 'extended' loss of PPO. It discourages the policy distribution from being “too certain” (default: no entropy regularization." )
-    parser.add_argument('--hidden_size', type = int, default = 128, help="Number of neurons of the hidden layers of the network.")
-    parser.add_argument('--max_timesteps', type = int, default = 300, help= "Maximum number of timesteps each episode.")
-    parser.add_argument('--episodes', type = int, default = 1000, help = "Number of training episodes.")
 
 
-    args = parser.parse_args()
 
-    batch_size = args.batch_size
-    memory = args.memory
-    update_frequency = args.update_frequency
-    multi_step = args.multi_step
-    num_colors = args.num_colors
-    learning_rate = args.learning_rate
-    entropy_bonus = args.entropy_bonus
-    exploration = args.exploration
+
+
+
+
 
 
 
@@ -102,15 +143,15 @@ if __name__ == '__main__':
     if not memory:
         memory = 'minimum'
 
-    num_hidden = args.hidden_size
+    HIDDEN_STATE_SIZE = args.hidden_size
 
 
 
     #There are both the initial and the sink additional states.
-    NUM_STATE_AUTOMATON = num_colors+2
+    NUM_STATES_AUTOMATON = num_colors+2
     
 
-    """
+    NUM_EXPERTS = num_colors
 
 
 
@@ -118,22 +159,30 @@ if __name__ == '__main__':
 
 
     #Set this value here to the maximum timestep value.
-    MAX_EPISODE_TIMESTEPS = 300
+    MAX_EPISODE_TIMESTEPS = args.max_timesteps
 
     #Choose whether or not to visualize the environment
-    VISUALIZE = True
+    VISUALIZE = False
 
     # Limit the length of the episode of gym sapientino.
     environment = TimeLimit(environment, MAX_EPISODE_TIMESTEPS)
     environment = Environment.create(environment =environment,max_episode_timesteps=MAX_EPISODE_TIMESTEPS,visualize =VISUALIZE)
 
-    NUM_STATES_AUTOMATON = 4
+    #NUM_STATES_AUTOMATON = 4
 
-    HIDDEN_STATE_SIZE = 64
+    #HIDDEN_STATE_SIZE = 64
 
     AUTOMATON_STATE_ENCODING_SIZE = HIDDEN_STATE_SIZE*NUM_STATES_AUTOMATON
+    #AUTOMATON_STATE_ENCODING_SIZE = HIDDEN_STATE_SIZE*NUM_EXPERTS
 
-    agent = build_agent(agent = 'ppo', batch_size = 64,
+
+
+
+    agent = build_agent(agent = 'ppo', batch_size = batch_size,
+                        memory =memory,
+                        update_frequency=update_frequency,
+                        multi_step = multi_step,
+                        learning_rate=learning_rate,
 
                         environment = environment,
                         num_states_automaton =NUM_STATES_AUTOMATON,
@@ -141,12 +190,22 @@ if __name__ == '__main__':
 
                         hidden_layer_size=HIDDEN_STATE_SIZE,
 
-                        exploration =0.0,
+                        exploration =exploration,
 
-                        entropy_regularization=0.0
+                        entropy_regularization=entropy_bonus,
+
 
 
                         )
+
+
+    #Debugging prints
+    print("Istantiated an agent for training with parameters: ")
+    print(args)
+
+    print("The goal sequence is: ")
+    print(colors)
+
 
     trainer = NonMarkovianTrainer(agent,environment,NUM_STATES_AUTOMATON,AUTOMATON_STATE_ENCODING_SIZE,
                                   SINK_ID
@@ -155,11 +214,11 @@ if __name__ == '__main__':
 
 
 
-    EPISODES = 1000
+    EPISODES = args.episodes
 
     #Train the agent
 
-    training_results = trainer.train(episodes=EPISODES,evaluate=False)
+    training_results = trainer.train(episodes=EPISODES)
 
     print("Training of the agent complete: results are: ")
     print(training_results)

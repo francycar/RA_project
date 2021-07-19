@@ -12,7 +12,7 @@ DEBUG = True
 
 
 class NonMarkovianTrainer(object):
-    def __init__(self,agent,environment,num_state_automaton,
+    def __init__(self,agent,environment,number_of_experts,
                  automaton_encoding_size,sink_id
                  ):
 
@@ -32,7 +32,7 @@ class NonMarkovianTrainer(object):
 
 
 
-        self.num_state_automaton = num_state_automaton
+        self.number_of_experts = number_of_experts
         self.automaton_encoding_size = automaton_encoding_size
 
         self.sink_id = sink_id
@@ -45,6 +45,7 @@ class NonMarkovianTrainer(object):
 
 
         if DEBUG:
+            print("\n################### Agent architecture ###################\n")
             architecture = self.agent.get_architecture()
             print(architecture)
 
@@ -91,7 +92,7 @@ class NonMarkovianTrainer(object):
                 Prepare the encoded automaton state.
             """
             one_hot_encoding = one_hot_encode(automaton_state,
-                                              self.automaton_encoding_size,self.num_state_automaton)
+                                              self.automaton_encoding_size,self.number_of_experts)
 
             return dict(gymtpl0 =obs,
                         gymtpl1 = one_hot_encoding)
