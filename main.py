@@ -223,10 +223,4 @@ if __name__ == '__main__':
     print("Training of the agent complete: results are: ")
     print(training_results)
 
-    #Plot the total reward on the various evaluation epochs.
-    plt.figure(1)
-    plt.title("Total reward on evaluation phases")
-    plt.xlabel("Evaluation epoch")
-    plt.ylabel("Total reward")
-    plt.plot(np.arange(1,len(training_results['evaluation_rewards'])+1),training_results['evaluation_rewards'])
-    plt.show()
+   
