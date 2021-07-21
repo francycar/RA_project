@@ -5,15 +5,17 @@ from tensorforce.environments import Environment
 from utils.one_hot import one_hot_encode
 from tqdm.auto import tqdm
 
+from reward_shaping import *
 
-DEBUG = True
+
+DEBUG = False
 
 
 
 
 class NonMarkovianTrainer(object):
     def __init__(self,agent,environment,number_of_experts,
-                 automaton_encoding_size,sink_id
+                 automaton_encoding_size,sink_id, num_colors = 2,
                  ):
 
         """
@@ -41,6 +43,10 @@ class NonMarkovianTrainer(object):
         #Create both the agent and the environment that will be used a training time.
         self.agent = agent
         self.environment = environment
+
+
+        self.num_colors = num_colors
+        self.reward_shaping = RewardShaping(num_colors,self.sink_id)
 
 
 
@@ -139,31 +145,65 @@ class NonMarkovianTrainer(object):
                         Reward shaping.
                     """
 
+                    if self.num_colors == 2:
 
 
-                    #Terminate the episode with a negative reward if the goal DFA reaches SINK state (failure).
-                    if automaton_state == self.sink_id:
-                        reward = -500.0
-
-                        terminal = True
+                        if automaton_state == self.sink_id:
+                            reward = -500.0
+                            terminal = True
 
 
-                    elif automaton_state == 1 and prevAutState==0:
-                        reward = 500.0
+                        elif automaton_state == 1 and prevAutState==0:
+                            reward = 500.0
 
-                    elif automaton_state == 3 and prevAutState==1:
-                        reward = 500.0
-                        print("Visited goal on episode: ", episode)
-                    """
-                    elif automaton_state ==4 and prevAutState == 3:
-                        reward = 500.0
-                        print("Visited goal on episode: ", episode)
-                    """
-                    """
-                    elif automaton_state == 5:
-                        reward = 500.0
-                        print("Visited goal on episode: ", episode)
-                    """
+                        elif automaton_state == 3 and prevAutState==1:
+                            reward = 500.0
+                            print("Visited goal on episode: ", episode)
+                            terminal = True
+
+                    elif self.num_colors == 3:
+
+                        if automaton_state == self.sink_id:
+                            reward = -500.0
+
+                            terminal = True
+
+
+                        elif automaton_state == 1 and prevAutState==0:
+                            reward = 500.0
+
+                        elif automaton_state == 3 and prevAutState==1:
+                            reward = 500.0
+
+                        elif automaton_state ==4 and prevAutState == 3:
+                            reward = 500.0
+                            print("Visited goal on episode: ", episode)
+                            terminal = True
+
+
+
+                    elif self.num_colors == 4:
+
+                        #Terminate the episode with a negative reward if the goal DFA reaches SINK state (failure).
+                        if automaton_state == self.sink_id:
+                            reward = -500.0
+
+                            terminal = True
+
+
+                        elif automaton_state == 1 and prevAutState==0:
+                            reward = 500.0
+
+                        elif automaton_state == 3 and prevAutState==1:
+                            reward = 500.0
+
+                        elif automaton_state ==4 and prevAutState == 3:
+                            reward = 500.0
+
+                        elif automaton_state == 5:
+                            reward = 500.0
+                            print("Visited goal on episode: ", episode)
+                            terminal = True
 
 
 

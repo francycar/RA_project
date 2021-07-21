@@ -50,7 +50,7 @@ if __name__ == '__main__':
     parser.add_argument('--max_timesteps', type = int, default = 300, help= "Maximum number of timesteps each episode.")
     parser.add_argument('--episodes', type = int, default = 1000, help = "Number of training episodes.")
     parser.add_argument('--path', type = str, default = None, help = "Path to the map file inside the file system.")
-    parser.add_argument("--sequence", nargs="+", default=None)
+    parser.add_argument("--sequence", nargs="+", default=None, help="Goal sequence for the training specified as a list of strings.")
 
 
 
@@ -208,7 +208,7 @@ if __name__ == '__main__':
 
 
     trainer = NonMarkovianTrainer(agent,environment,NUM_STATES_AUTOMATON,AUTOMATON_STATE_ENCODING_SIZE,
-                                  SINK_ID
+                                  SINK_ID,num_colors=num_colors
                                   )
 
 
@@ -223,4 +223,4 @@ if __name__ == '__main__':
     print("Training of the agent complete: results are: ")
     print(training_results)
 
-   
+
