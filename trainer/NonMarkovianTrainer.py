@@ -5,7 +5,7 @@ from tensorforce.environments import Environment
 from utils.one_hot import one_hot_encode
 from tqdm.auto import tqdm
 
-from reward_shaping import *
+
 
 
 DEBUG = False
@@ -46,7 +46,6 @@ class NonMarkovianTrainer(object):
 
 
         self.num_colors = num_colors
-        self.reward_shaping = RewardShaping(num_colors,self.sink_id)
 
 
 
