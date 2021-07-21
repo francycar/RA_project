@@ -82,9 +82,12 @@ Change the directory to the project root directory
 `	cd RA_project` 
 
 
-And install the required packages
+Install the required packages
 
 `	pip install -r requirements.txt` 
+
+And finally refer to the **[tensorforce 0.6.4](https://github.com/tensorforce/tensorforce)** documentation to install the library.
+
 
 ## Run a training experiment
 You can run the reinforcement learning experiments in both training and evaluation mode.
@@ -125,6 +128,11 @@ You can specify additional training *hyperparameters* to the command line
 - --*hidden_size*: number of neurons of the hidden layers of the network.
 
 - --*learning_rate*: learning rate for the optimization algorithm
+
+- --*path*: path to the map file inside the file system.
+
+- --*sequence*: goal sequence for the training specified as a list of strings.
+
 
 For a finer agent customization, you can directly modify the agent construction inside *agent_config.py* 
 Refer to the **[tensorforce 0.6.4](https://github.com/tensorforce/tensorforce)** documentation for tensorforce agent construction syntax.
