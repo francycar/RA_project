@@ -2,9 +2,11 @@
 
 # Reasoning Agent project
 
-This folder contains also a pdf **[report](https://github.com/francycar/RA_project/blob/main/report/Reasoning_Agent.pdf)** report for the project.
+This folder contains also a pdf **[report](https://github.com/francycar/RA_project/blob/main/report/Reasoning_Agent.pdf)** report with a more detailed description of the project.
 <br/>
-We attach also a deck of **[slides](https://github.com/francycar/RA_project/blob/main/presentation/RA.pptx)** in pptx format.
+We attach also a deck of **[slides](https://github.com/francycar/RA_project/blob/main/presentation/RA.pptx)** in pptx format for the exam presentation.
+<br/><br/>
+Link to a drive folder containing **[videos](https://drive.google.com/drive/folders/1Y0T0ApMOfnIS72bv4MMk-vqoOm-HenN1?usp=sharing)** of the exam presentation.
 
 
 
