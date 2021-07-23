@@ -1,6 +1,13 @@
 
 
-# Reasoning Agent project:
+# Reasoning Agent project
+
+This folder contains also a pdf **[report](https://github.com/francycar/RA_project/blob/main/report/Reasoning_Agent.pdf)** report for the project.
+<br/>
+We attach also a deck of **[slides](https://github.com/francycar/RA_project/blob/main/presentation/RA.pptx)** in pptx format.
+
+
+
 ## Non markovian policy networks for LTLf/LDLf goals
 
 This folder contains an implementation of a **non markovian policy network**  for a project whose goal is to develop a reinforcement learning agent for solving a **non markovian reward decision process**. The project is focused on temporal goal formulation and on showing how deep RL SOA approaches can be easily adapted to work outside a standard reinforcement learning scenario. 
