@@ -6,7 +6,7 @@ This folder contains also a pdf **[report](https://github.com/francycar/RA_proje
 <br/>
 We attach also a deck of **[slides](https://github.com/francycar/RA_project/blob/main/presentation/RA.pptx)** in pptx format for the exam presentation.
 <br/><br/>
-Link to a drive folder containing **[videos](https://drive.google.com/drive/folders/1Y0T0ApMOfnIS72bv4MMk-vqoOm-HenN1?usp=sharing)** of the exam presentation.
+Link to a drive folder containing **[videos](https://drive.google.com/drive/folders/1Y0T0ApMOfnIS72bv4MMk-vqoOm-HenN1?usp=sharing)** of the exam presentation held in 23/07/2021.
 
 
 
